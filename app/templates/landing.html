@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+{% block content %}
+<section class="hero">
+  <p class="badge priority-low">MVP pessoal</p>
+  <h1>Menos caos.<br>Mais foco.</h1>
+  <p>O 5T4RBUG ajuda você a transformar a lista de trabalho em um próximo passo claro: organize tarefas por prioridade, prazo e andamento.</p>
+  <div class="actions">
+    <a class="button button-primary" href="{{ url_for('auth.register') }}">Criar minha conta</a>
+    <a class="button" href="{{ url_for('auth.login') }}">Já tenho uma conta</a>
+  </div>
+</section>
+{% endblock %}

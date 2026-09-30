@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+{% block title %}Minhas tarefas — 5T4RBUG{% endblock %}
+{% block content %}
+<div class="dashboard-head">
+  <div><p class="badge priority-low">SEU PAINEL</p><h1>Minhas tarefas</h1><p>Priorize o que move seu trabalho hoje.</p></div>
+</div>
+<div class="grid">
+  <section class="panel">
+    <h2>Nova tarefa</h2>
+    <p>Comece pelo resultado que precisa acontecer.</p>
+    <form method="post" action="{{ url_for('main.create_task') }}">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <div class="field"><label for="title">Título</label><input id="title" name="title" required maxlength="120" placeholder="Ex.: Revisar relatório mensal"></div>
+      <div class="field"><label for="description">Descrição <span>(opcional)</span></label><textarea id="description" name="description" maxlength="2000" placeholder="Qual é o próximo passo concreto?"></textarea></div>
+      <div class="field"><label for="priority">Prioridade</label><select id="priority" name="priority"><option value="high">Alta</option><option value="medium" selected>Média</option><option value="low">Baixa</option></select></div>
+      <div class="field"><label for="due_date">Prazo <span>(opcional)</span></label><input id="due_date" name="due_date" type="date"></div>
+      <button class="button button-primary" type="submit">Adicionar tarefa</button>
+    </form>
+  </section>
+  <section>
+    <div class="filters" aria-label="Filtrar tarefas">
+      <a class="filter {% if status_filter == 'all' %}active{% endif %}" href="{{ url_for('main.dashboard', status='all') }}">Todas</a>
+      <a class="filter {% if status_filter == 'pending' %}active{% endif %}" href="{{ url_for('main.dashboard', status='pending') }}">Pendentes</a>
+      <a class="filter {% if status_filter == 'in_progress' %}active{% endif %}" href="{{ url_for('main.dashboard', status='in_progress') }}">Em andamento</a>
+      <a class="filter {% if status_filter == 'done' %}active{% endif %}" href="{{ url_for('main.dashboard', status='done') }}">Concluídas</a>
+    </div>
+    {% if tasks %}
+      <div class="task-list">
+      {% for task in tasks %}
+        <article class="task-card {% if task.status == 'done' %}is-done{% endif %}">
+          <div class="task-top"><div><h3>{{ task.title }}</h3><span class="badge priority-{{ task.priority }}">{{ {'high':'ALTA', 'medium':'MÉDIA', 'low':'BAIXA'}[task.priority] }}</span></div><span class="task-meta">{{ {'pending':'Pendente', 'in_progress':'Em andamento', 'done':'Concluída'}[task.status] }}</span></div>
+          {% if task.description %}<p>{{ task.description }}</p>{% endif %}
+          {% if task.due_date %}<div class="task-meta">Prazo: {{ task.due_date }}</div>{% endif %}
+          <div class="task-actions">
+            <form method="post" action="{{ url_for('main.toggle_task', task_id=task.id) }}"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="link-button" type="submit">{% if task.status == 'done' %}Reabrir{% else %}Concluir{% endif %}</button></form>
+            <details><summary class="link-button">Editar</summary>
+              <form method="post" action="{{ url_for('main.update_task', task_id=task.id) }}">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <div class="field"><label>Título</label><input name="title" value="{{ task.title }}" required maxlength="120"></div>
+                <div class="field"><label>Descrição</label><textarea name="description" maxlength="2000">{{ task.description }}</textarea></div>
+                <div class="field"><label>Prioridade</label><select name="priority"><option value="high" {% if task.priority == 'high' %}selected{% endif %}>Alta</option><option value="medium" {% if task.priority == 'medium' %}selected{% endif %}>Média</option><option value="low" {% if task.priority == 'low' %}selected{% endif %}>Baixa</option></select></div>
+                <div class="field"><label>Status</label><select name="status"><option value="pending" {% if task.status == 'pending' %}selected{% endif %}>Pendente</option><option value="in_progress" {% if task.status == 'in_progress' %}selected{% endif %}>Em andamento</option><option value="done" {% if task.status == 'done' %}selected{% endif %}>Concluída</option></select></div>
+                <div class="field"><label>Prazo</label><input name="due_date" type="date" value="{{ task.due_date or '' }}"></div>
+                <button class="button button-primary" type="submit">Salvar</button>
+              </form>
+            </details>
+            <form method="post" action="{{ url_for('main.delete_task', task_id=task.id) }}"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="link-button" type="submit">Excluir</button></form>
+          </div>
+        </article>
+      {% endfor %}
+      </div>
+    {% else %}<div class="empty">Nenhuma tarefa neste filtro. Adicione uma tarefa ao lado para começar.</div>{% endif %}
+  </section>
+</div>
+{% endblock %}
