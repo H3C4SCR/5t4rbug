@@ -45,6 +45,14 @@ def revoke_session(session_token):
         db.commit()
 
 
+def as_utc(value):
+    if isinstance(value, str):
+        value = datetime.fromisoformat(value)
+    if value.tzinfo is None:
+        value = value.replace(tzinfo=timezone.utc)
+    return value
+
+
 def load_current_user():
     g.user = None
     g.session = None
@@ -66,8 +74,7 @@ def load_current_user():
     if session is None:
         return
 
-    expires_at = datetime.fromisoformat(session["expires_at"])
-    if expires_at <= datetime.now(timezone.utc):
+    if as_utc(session["expires_at"]) <= datetime.now(timezone.utc):
         revoke_session(token)
         return
 

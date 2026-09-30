@@ -5,6 +5,7 @@ from pathlib import Path
 class Config:
     BASE_DIR = Path(__file__).resolve().parent.parent
     INSTANCE_PATH = BASE_DIR / "instance"
+    DATABASE_URL = os.environ.get("DATABASE_URL")
     DATABASE = (
         Path(os.environ["DATABASE_PATH"])
         if os.environ.get("DATABASE_PATH")

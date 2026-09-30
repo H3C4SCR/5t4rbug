@@ -117,7 +117,7 @@ def update_task(task_id):
         """
         UPDATE tasks
         SET title = ?, description = ?, priority = ?, status = ?, due_date = ?,
-            updated_at = datetime('now')
+            updated_at = CURRENT_TIMESTAMP
         WHERE id = ? AND user_id = ?
         """,
         (*values, task_id, g.user["id"]),
@@ -135,7 +135,7 @@ def toggle_task(task_id):
     next_status = "done" if task["status"] != "done" else "pending"
     db = get_db()
     db.execute(
-        "UPDATE tasks SET status = ?, updated_at = datetime('now') WHERE id = ? AND user_id = ?",
+        "UPDATE tasks SET status = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ? AND user_id = ?",
         (next_status, task_id, g.user["id"]),
     )
     db.commit()
