@@ -68,19 +68,31 @@ def register():
         else:
             db = get_db()
             try:
-                cursor = db.execute(
-                    "INSERT INTO users (email, password_hash) VALUES (?, ?)",
-                    (email, hash_password(password)),
-                )
+                if current_app.config.get("DATABASE_URL"):
+                    cursor = db.execute(
+                        "INSERT INTO users (email, password_hash) VALUES (?, ?) RETURNING id",
+                        (email, hash_password(password)),
+                    )
+                    user_id = cursor.fetchone()["id"]
+                else:
+                    cursor = db.execute(
+                        "INSERT INTO users (email, password_hash) VALUES (?, ?)",
+                        (email, hash_password(password)),
+                    )
+                    user_id = cursor.lastrowid
                 db.commit()
             except Exception as error:
                 db.rollback()
-                if "UNIQUE constraint failed" in str(error):
+                is_duplicate = (
+                    getattr(error, "sqlstate", None) == "23505"
+                    or "UNIQUE constraint failed" in str(error)
+                )
+                if is_duplicate:
                     flash("Não foi possível criar a conta com esses dados.", "error")
                 else:
                     raise
             else:
-                token, csrf = create_session(cursor.lastrowid)
+                token, csrf = create_session(user_id)
                 response = redirect(url_for("main.dashboard"))
                 return set_session_cookie(response, token, csrf)
 
