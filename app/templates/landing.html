@@ -1,12 +1,12 @@
 {% extends 'base.html' %}
 {% block content %}
 <section class="hero">
-  <p class="badge priority-low">MVP pessoal</p>
+  <p class="badge priority-low">MVP privado</p>
   <h1>Menos caos.<br>Mais foco.</h1>
-  <p>O 5T4RBUG ajuda você a transformar a lista de trabalho em um próximo passo claro: organize tarefas por prioridade, prazo e andamento.</p>
+  <p>O 5T4RBUG organiza suas tarefas direto neste dispositivo. Sem cadastro, sem login e sem enviar sua lista para um servidor.</p>
   <div class="actions">
-    <a class="button button-primary" href="{{ url_for('auth.register') }}">Criar minha conta</a>
-    <a class="button" href="{{ url_for('auth.login') }}">Já tenho uma conta</a>
+    <a class="button button-primary" href="{{ url_for('main.dashboard') }}">Abrir minhas tarefas</a>
   </div>
+  <p class="privacy-note">Suas tarefas ficam neste navegador. Se você limpar os dados do navegador ou trocar de dispositivo, elas não serão sincronizadas.</p>
 </section>
 {% endblock %}
